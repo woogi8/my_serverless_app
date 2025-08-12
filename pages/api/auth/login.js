@@ -16,20 +16,38 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
 })
 
 export default async function handler(req, res) {
+  // 요청 로깅
+  console.log('=== API REQUEST ===')
+  console.log('Method:', req.method)
+  console.log('URL:', req.url)
+  console.log('Headers:', req.headers)
+  console.log('Body:', req.body)
+  
   // CORS 헤더 설정
   res.setHeader('Access-Control-Allow-Origin', '*')
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
 
   // OPTIONS 요청 처리 (CORS preflight)
   if (req.method === 'OPTIONS') {
+    console.log('OPTIONS request handled')
     return res.status(200).end()
   }
 
-  // POST 메소드만 허용
+  // GET 요청도 허용 (테스트용)
+  if (req.method === 'GET') {
+    console.log('GET request received')
+    return res.status(200).json({ message: 'Login API is working', method: 'GET' })
+  }
+
+  // POST 메소드 처리
   if (req.method !== 'POST') {
     console.log('Invalid method:', req.method)
-    return res.status(405).json({ message: `Method ${req.method} not allowed. Use POST.` })
+    return res.status(405).json({ 
+      message: `Method ${req.method} not allowed. Use POST.`,
+      receivedMethod: req.method,
+      allowedMethods: ['POST', 'GET', 'OPTIONS']
+    })
   }
 
   const { user_id, user_pw } = req.body
