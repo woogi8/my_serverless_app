@@ -1,4 +1,7 @@
 export default function handler(req, res) {
+  // LEGO Collection API - Updated for reliable deployment
+  res.setHeader('Content-Type', 'application/json')
+  
   if (req.method === 'GET') {
     res.status(200).json({
       success: true,
@@ -9,9 +12,14 @@ export default function handler(req, res) {
         { id: 4, name: 'LEGO Star Wars Millennium Falcon', set_number: '75192', pieces: 7541, year: 2017 },
         { id: 5, name: 'LEGO Creator Taj Mahal', set_number: '10256', pieces: 5923, year: 2017 }
       ],
-      count: 5
+      count: 5,
+      timestamp: new Date().toISOString()
     })
   } else {
-    res.status(405).json({ message: 'Method not allowed' })
+    res.status(405).json({ 
+      success: false,
+      message: 'Method not allowed',
+      method: req.method 
+    })
   }
 }
