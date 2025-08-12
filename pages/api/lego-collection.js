@@ -20,22 +20,14 @@ export default async function handler(req, res) {
     console.log('URL value:', supabaseUrl)
     console.log('Key length:', supabaseKey?.length)
 
-    // 환경 변수 검증 - 없으면 폴백 데이터 반환
+    // 환경 변수 검증
     if (!supabaseUrl || !supabaseKey) {
-      console.log('Environment variables missing, using fallback data')
-      return res.status(200).json({
-        success: true,
-        data: [
-          { id: 1, name: 'LEGO Creator Expert Big Ben', set_number: '10253', pieces: 4163, year: 2016, status: 'owned' },
-          { id: 2, name: 'LEGO Technic Bugatti Chiron', set_number: '42083', pieces: 3599, year: 2018, status: 'owned' },
-          { id: 3, name: 'LEGO Architecture Statue of Liberty', set_number: '21042', pieces: 1685, year: 2018, status: 'wishlist' },
-          { id: 4, name: 'LEGO Star Wars Millennium Falcon', set_number: '75192', pieces: 7541, year: 2017, status: 'owned' },
-          { id: 5, name: 'LEGO Creator Taj Mahal', set_number: '10256', pieces: 5923, year: 2017, status: 'owned' }
-        ],
-        count: 5,
-        timestamp: new Date().toISOString(),
-        source: 'Fallback data (Environment variables not configured)',
-        warning: 'Please set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in Vercel environment variables'
+      console.log('Environment variables missing')
+      return res.status(500).json({
+        success: false,
+        message: 'Supabase configuration missing',
+        error: 'Environment variables NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required',
+        timestamp: new Date().toISOString()
       })
     }
 
@@ -68,37 +60,25 @@ export default async function handler(req, res) {
     } catch (queryError) {
       console.error('Network/Query error:', queryError)
       
-      // 네트워크 오류 시 폴백 데이터 반환
-      return res.status(200).json({
-        success: true,
-        data: [
-          { id: 1, name: 'LEGO Creator Expert Big Ben', set_number: '10253', pieces: 4163, year: 2016, status: 'owned' },
-          { id: 2, name: 'LEGO Technic Bugatti Chiron', set_number: '42083', pieces: 3599, year: 2018, status: 'owned' },
-          { id: 3, name: 'LEGO Architecture Statue of Liberty', set_number: '21042', pieces: 1685, year: 2018, status: 'wishlist' },
-          { id: 4, name: 'LEGO Star Wars Millennium Falcon', set_number: '75192', pieces: 7541, year: 2017, status: 'owned' },
-          { id: 5, name: 'LEGO Creator Taj Mahal', set_number: '10256', pieces: 5923, year: 2017, status: 'owned' }
-        ],
-        count: 5,
-        timestamp: new Date().toISOString(),
-        source: 'Fallback data (Supabase connection failed)',
-        warning: 'Using test data due to network connectivity issues'
+      // 네트워크 연결 실패 시 에러 반환
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to connect to Supabase',
+        error: queryError.message,
+        timestamp: new Date().toISOString()
       })
     }
 
     if (error) {
       console.error('Supabase query error:', error)
       
-      // 데이터베이스 오류 시에도 폴백 데이터 반환
-      return res.status(200).json({
-        success: true,
-        data: [
-          { id: 1, name: 'LEGO Creator Expert Big Ben', set_number: '10253', pieces: 4163, year: 2016, status: 'owned' },
-          { id: 2, name: 'LEGO Technic Bugatti Chiron', set_number: '42083', pieces: 3599, year: 2018, status: 'owned' }
-        ],
-        count: 2,
-        timestamp: new Date().toISOString(),
-        source: 'Fallback data (Database query failed)',
-        error: error.message
+      // 데이터베이스 쿼리 오류 시 에러 반환
+      return res.status(500).json({
+        success: false,
+        message: 'Database query failed',
+        error: error.message,
+        code: error.code,
+        timestamp: new Date().toISOString()
       })
     }
 
