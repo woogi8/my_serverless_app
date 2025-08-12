@@ -26,16 +26,38 @@ export default function LegoCollection() {
     setError('')
     
     try {
+      console.log('Fetching data from /api/lego/collection...')
       const response = await fetch('/api/lego/collection')
-      const result = await response.json()
+      
+      console.log('Response status:', response.status)
+      console.log('Response headers:', response.headers)
+      
+      const responseText = await response.text()
+      console.log('Raw response:', responseText)
+
+      // HTML 응답인지 확인
+      if (responseText.trim().startsWith('<!DOCTYPE') || responseText.trim().startsWith('<html')) {
+        setError(`API returned HTML instead of JSON. Status: ${response.status}`)
+        return
+      }
+
+      let result
+      try {
+        result = JSON.parse(responseText)
+      } catch (parseError) {
+        setError(`JSON parsing error: ${parseError.message}`)
+        console.error('JSON parse error:', parseError)
+        return
+      }
 
       if (response.ok && result.success) {
-        setLegoData(result.data)
+        setLegoData(result.data || [])
+        console.log('Data loaded successfully:', result.data?.length, 'items')
       } else {
-        setError(result.message || 'Failed to fetch data')
+        setError(result.message || `API Error: ${response.status}`)
       }
     } catch (err) {
-      setError('Network error occurred')
+      setError(`Network error: ${err.message}`)
       console.error('Error fetching LEGO data:', err)
     } finally {
       setDataLoading(false)
