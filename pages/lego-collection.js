@@ -26,8 +26,8 @@ export default function LegoCollection() {
     setError('')
     
     try {
-      console.log('Fetching data from /api/lego/collection...')
-      const response = await fetch('/api/lego/collection')
+      console.log('Fetching data from /api/lego-collection...')
+      const response = await fetch('/api/lego-collection')
       
       console.log('Response status:', response.status)
       console.log('Response headers:', response.headers)
