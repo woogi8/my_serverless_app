@@ -6,6 +6,7 @@ export default function Sidebar({ user, onLogout }) {
 
   const menuItems = [
     { icon: '🏠', label: 'Dashboard', href: '/' },
+    { icon: '🧱', label: '레고 소장품', href: '/lego-collection' },
     { icon: '👤', label: 'Profile', href: '/profile' },
     { icon: '📊', label: 'Analytics', href: '/analytics' },
     { icon: '⚙️', label: 'Settings', href: '/settings' },
@@ -144,8 +145,7 @@ export default function Sidebar({ user, onLogout }) {
               }}
               onClick={(e) => {
                 e.preventDefault()
-                // 실제 라우팅은 나중에 구현
-                console.log('Navigate to:', item.href)
+                window.location.href = item.href
               }}
             >
               <span style={{
