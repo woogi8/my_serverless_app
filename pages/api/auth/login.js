@@ -16,8 +16,20 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
 })
 
 export default async function handler(req, res) {
+  // CORS 헤더 설정
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+
+  // OPTIONS 요청 처리 (CORS preflight)
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end()
+  }
+
+  // POST 메소드만 허용
   if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Method not allowed' })
+    console.log('Invalid method:', req.method)
+    return res.status(405).json({ message: `Method ${req.method} not allowed. Use POST.` })
   }
 
   const { user_id, user_pw } = req.body
